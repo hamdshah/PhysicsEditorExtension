@@ -7,13 +7,15 @@ using System;
 
 [CustomEditor(typeof(Polygon))]
 public class PhysicsEditor : Editor {
-
+	
+	SerializedProperty polygonCollider;
 	SerializedProperty plistPath;
 	SerializedProperty pixelsPerUnit;
 	SerializedProperty totalPolygonsinFile;
 	SerializedProperty selectedIndex;
 
 	public void OnEnable () {
+		polygonCollider = serializedObject.FindProperty("_polygonCollider");
 		plistPath = serializedObject.FindProperty("PlistPath");
 		pixelsPerUnit = serializedObject.FindProperty("PixelsPerUnit");
 		totalPolygonsinFile = serializedObject.FindProperty("_totalPolygonsinFile");
@@ -29,6 +31,7 @@ public class PhysicsEditor : Editor {
 
 		GUI.changed = false;
 
+		EditorGUILayout.PropertyField(polygonCollider, new GUIContent("Polygon Collider"));
 		EditorGUILayout.PropertyField(plistPath, new GUIContent("Plist Path"));
 
 		/*If file path is changed*/
