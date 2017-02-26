@@ -1,3 +1,9 @@
+
+# **Deprecation Notice**
+
+This extension is **no longer under active devlopment**. With Unity 5, you can now use **[Polygon Collider 2D](https://docs.unity3d.com/Manual/class-PolygonCollider2D.html)**.
+
+
 PhysicsEditorExtension
 ======================
 
