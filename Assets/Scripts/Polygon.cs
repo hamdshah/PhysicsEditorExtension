@@ -36,7 +36,7 @@ public class Polygon : MonoBehaviour {
 	
 	public int selectedIndex = 0;
 
-	private PolygonCollider2D _polygonCollider;
+	public PolygonCollider2D _polygonCollider = null;
 
 	[SerializeField]
 	public TextAsset PlistPath = null;
@@ -53,7 +53,8 @@ public class Polygon : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-		_polygonCollider = this.GetComponent<PolygonCollider2D>();
+		if (_polygonCollider == null)
+			_polygonCollider = this.GetComponent<PolygonCollider2D>();
 
 		//this.ClearBodiesList();
 
@@ -91,30 +92,35 @@ public class Polygon : MonoBehaviour {
 				_totalPolygonsinFile[i].bodyname = keyNames[i] as String;
 
 				Hashtable bodyDic = bodies[keyNames[i]] as Hashtable;
-				/*Using single fixture because unity support single fixture*/
 				ArrayList fixtures = bodyDic["fixtures"] as ArrayList;
+				
+				var totalPaths = new List<PolygonPath>();
 
-				Hashtable fixture1 = fixtures[0] as Hashtable;
-
-				ArrayList polygonsArray = fixture1["polygons"] as ArrayList;
-
-				PolygonPath[] totalPaths = new PolygonPath[polygonsArray.Count];
-
-				for(int j = 0; j<totalPaths.Length; j++) {
-					ArrayList pointArray = polygonsArray[j] as ArrayList;
-					PolygonPath tempPath = new PolygonPath();
-					Vector2[] pointsVector = new Vector2[pointArray.Count];
-					for(int k = 0; k<pointsVector.Length; k++) {
-						string pointInString = pointArray[k] as String;
-						pointsVector[k] = this.ConvertToVector2FromString(pointInString);
+				for (var f = 0; f < fixtures.Count; f++) {
+					var fixture = fixtures[f] as Hashtable;
+					if (fixture == null)
+						continue;
+					
+					var polygonsArray = fixture["polygons"] as ArrayList;
+					if (polygonsArray == null)
+						continue;
+					
+					for(int j = 0; j < polygonsArray.Count; j++) {
+						ArrayList pointArray = polygonsArray[j] as ArrayList;
+						PolygonPath tempPath = new PolygonPath();
+						Vector2[] pointsVector = new Vector2[pointArray.Count];
+						for(int k = 0; k<pointsVector.Length; k++) {
+							string pointInString = pointArray[k] as String;
+							pointsVector[k] = this.ConvertToVector2FromString(pointInString);
+						}
+						
+						tempPath.points = pointsVector;
+						
+						totalPaths.Add(tempPath);
 					}
-
-					tempPath.points = pointsVector;
-
-					totalPaths[j] = tempPath;
 				}
 
-				_totalPolygonsinFile[i].paths = totalPaths;
+				_totalPolygonsinFile[i].paths = totalPaths.ToArray();
 
 			}
 
@@ -142,6 +148,9 @@ public class Polygon : MonoBehaviour {
 
 	public void setPolygonOfIndex(int index) {
 		_polygonObject = _totalPolygonsinFile[index];
+
+		if (_polygonCollider == null)
+			return;
 
 		_polygonCollider.pathCount = _polygonObject.TotalPaths;
 
